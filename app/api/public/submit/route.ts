@@ -19,7 +19,12 @@ export async function POST(req: Request) {
     }: {
       slug: string
       answers: Answers
-      contact?: { name?: string; email?: string; whatsapp?: string }
+      contact?: {
+        name?: string
+        email?: string
+        whatsapp?: string
+        instagram?: string
+      }
       forced_result_id?: string | null
     } = body ?? {}
 
@@ -50,6 +55,9 @@ export async function POST(req: Request) {
         name: contact?.name || null,
         email: contact?.email || null,
         whatsapp: contact?.whatsapp || null,
+        // Só inclui instagram quando preenchido — assim o insert não quebra
+        // caso a coluna ainda não exista no banco (migração pendente).
+        ...(contact?.instagram ? { instagram: contact.instagram } : {}),
         answers,
         scores,
         result_id: result?.id ?? null,
@@ -85,6 +93,7 @@ export async function POST(req: Request) {
           name: contact?.name || null,
           email: contact?.email || null,
           whatsapp: contact?.whatsapp || null,
+          instagram: contact?.instagram || null,
         },
         answers,
         scores,

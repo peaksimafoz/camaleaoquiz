@@ -183,6 +183,11 @@ export function SettingsTab({
             checked={s.collect_whatsapp ?? true}
             onChange={(v) => setSettings({ collect_whatsapp: v })}
           />
+          <Check
+            label="Instagram"
+            checked={s.collect_instagram ?? false}
+            onChange={(v) => setSettings({ collect_instagram: v })}
+          />
         </div>
       </Section>
 

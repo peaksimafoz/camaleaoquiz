@@ -25,6 +25,7 @@ export interface QuizSettings {
   collect_name?: boolean
   collect_email?: boolean
   collect_whatsapp?: boolean
+  collect_instagram?: boolean
 }
 
 export interface Quiz {
@@ -113,6 +114,7 @@ export interface Lead {
   name: string | null
   email: string | null
   whatsapp: string | null
+  instagram: string | null
   answers: Record<string, unknown>
   scores: Record<string, number>
   result_id: string | null

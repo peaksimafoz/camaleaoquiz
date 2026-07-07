@@ -53,6 +53,7 @@ create table if not exists leads (
   name       text,
   email      text,
   whatsapp   text,
+  instagram  text,
   answers    jsonb not null default '{}'::jsonb,
   scores     jsonb not null default '{}'::jsonb,
   result_id  uuid references results(id) on delete set null,

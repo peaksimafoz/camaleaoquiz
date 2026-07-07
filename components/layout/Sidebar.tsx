@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 const NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/quizzes', label: 'Quizzes', icon: '🧩' },
+  { href: '/leads', label: 'Leads', icon: '📇' },
 ]
 
 export function Sidebar({ email }: { email: string }) {

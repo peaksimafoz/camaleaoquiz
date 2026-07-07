@@ -12,8 +12,18 @@ import type {
 import type { Answers } from '@/lib/scoring'
 
 type Phase = 'intro' | 'lead' | 'question' | 'submitting' | 'result'
-type Contact = { name?: string; email?: string; whatsapp?: string }
-type Collect = { name: boolean; email: boolean; whatsapp: boolean }
+type Contact = {
+  name?: string
+  email?: string
+  whatsapp?: string
+  instagram?: string
+}
+type Collect = {
+  name: boolean
+  email: boolean
+  whatsapp: boolean
+  instagram: boolean
+}
 
 // Dispara um evento de analytics (fire-and-forget).
 function fireEvent(quizId: string, eventType: string, questionId?: string) {
@@ -38,8 +48,10 @@ export function QuizRunner({ data }: { data: PublicQuiz }) {
     name: settings.collect_name ?? true,
     email: settings.collect_email ?? true,
     whatsapp: settings.collect_whatsapp ?? true,
+    instagram: settings.collect_instagram ?? false,
   }
-  const shouldCollect = collect.name || collect.email || collect.whatsapp
+  const shouldCollect =
+    collect.name || collect.email || collect.whatsapp || collect.instagram
 
   const [phase, setPhase] = useState<Phase>('intro')
   const [currentId, setCurrentId] = useState<string>(questions[0]?.id ?? '')
@@ -401,6 +413,7 @@ function LeadScreen({
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
+  const [instagram, setInstagram] = useState('')
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -408,6 +421,7 @@ function LeadScreen({
       name: collect.name ? name.trim() : undefined,
       email: collect.email ? email.trim() : undefined,
       whatsapp: collect.whatsapp ? whatsapp.trim() : undefined,
+      instagram: collect.instagram ? instagram.trim() : undefined,
     })
   }
 
@@ -445,6 +459,15 @@ function LeadScreen({
             value={whatsapp}
             onChange={(e) => setWhatsapp(e.target.value)}
             placeholder="Seu WhatsApp"
+            className={field}
+          />
+        )}
+        {collect.instagram && (
+          <input
+            required
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+            placeholder="Seu @ do Instagram"
             className={field}
           />
         )}
