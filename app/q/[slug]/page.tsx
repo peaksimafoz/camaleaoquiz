@@ -1,6 +1,9 @@
 import { getPublicQuiz } from '@/lib/public'
 import { QuizRunner } from '@/components/public/QuizRunner'
 
+// Sempre renderiza fresco (as configurações do quiz mudam no banco a qualquer hora).
+export const dynamic = 'force-dynamic'
+
 export default async function PublicQuizPage({
   params,
 }: {

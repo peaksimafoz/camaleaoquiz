@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getPublicQuiz } from '@/lib/public'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/public/quiz/[slug] → quiz ativo + perguntas + resultados.
 // Público (o middleware libera /api/public). Útil para embeds futuros.
 export async function GET(
