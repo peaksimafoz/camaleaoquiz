@@ -11,6 +11,11 @@ export type EventType =
   | 'completed'
   | 'abandoned'
 
+export interface Testimonial {
+  text: string
+  author: string
+}
+
 export interface QuizSettings {
   intro_title?: string
   intro_subtitle?: string
@@ -21,6 +26,9 @@ export interface QuizSettings {
   intro_social_proof?: string
   intro_time?: string
   result_guarantee?: string
+  // Depoimentos: o quiz sorteia um para exibir no resultado a cada visita.
+  testimonials?: Testimonial[]
+  // Legado (fallback quando `testimonials` está vazio)
   testimonial_text?: string
   testimonial_author?: string
   // Categorias de pontuação do quiz (ex.: 'comunicacao', 'lideranca'). As opções

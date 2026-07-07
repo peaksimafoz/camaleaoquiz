@@ -518,6 +518,24 @@ function ResultScreen({
   settings: QuizSettings
   primary: string
 }) {
+  // Pool de depoimentos (novo formato de lista, com fallback pro legado).
+  const pool =
+    settings.testimonials && settings.testimonials.length > 0
+      ? settings.testimonials
+      : settings.testimonial_text
+        ? [
+            {
+              text: settings.testimonial_text,
+              author: settings.testimonial_author || '',
+            },
+          ]
+        : []
+  // Sorteia um depoimento (fixo durante a sessão de resultado).
+  const [tIdx] = useState(() =>
+    pool.length > 0 ? Math.floor(Math.random() * pool.length) : 0
+  )
+  const testimonial = pool[tIdx]
+
   if (!result) {
     return (
       <div className="py-6 text-center">
@@ -550,14 +568,14 @@ function ResultScreen({
         </div>
       )}
 
-      {settings.testimonial_text && (
+      {testimonial && testimonial.text && (
         <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left">
           <p className="text-sm italic leading-relaxed text-slate-600">
-            “{settings.testimonial_text}”
+            “{testimonial.text}”
           </p>
-          {settings.testimonial_author && (
+          {testimonial.author && (
             <p className="mt-2 text-xs font-semibold text-slate-700">
-              — {settings.testimonial_author}
+              — {testimonial.author}
             </p>
           )}
         </div>

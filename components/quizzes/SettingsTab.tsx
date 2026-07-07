@@ -51,6 +51,21 @@ export function SettingsTab({
   }
 
   const categories = s.categories ?? []
+  const testimonials = s.testimonials ?? []
+
+  function updateTestimonial(i: number, patch: Partial<{ text: string; author: string }>) {
+    setSettings({
+      testimonials: testimonials.map((t, idx) =>
+        idx === i ? { ...t, ...patch } : t
+      ),
+    })
+  }
+  function addTestimonial() {
+    setSettings({ testimonials: [...testimonials, { text: '', author: '' }] })
+  }
+  function removeTestimonial(i: number) {
+    setSettings({ testimonials: testimonials.filter((_, idx) => idx !== i) })
+  }
 
   function addCategory() {
     const c = newCat.trim().toLowerCase()
@@ -188,22 +203,58 @@ export function SettingsTab({
             placeholder="Garantia de 7 dias"
           />
         </Field>
-        <Field label="Depoimento (no resultado)">
-          <textarea
-            value={s.testimonial_text ?? ''}
-            onChange={(e) => setSettings({ testimonial_text: e.target.value })}
-            className={textareaCls}
-            placeholder="Frase do depoimento de um aluno."
-          />
-        </Field>
-        <Field label="Autor do depoimento">
-          <input
-            value={s.testimonial_author ?? ''}
-            onChange={(e) => setSettings({ testimonial_author: e.target.value })}
-            className={inputCls}
-            placeholder="João, empresário"
-          />
-        </Field>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            Depoimentos
+          </label>
+          <p className="mb-2 text-xs text-slate-400">
+            O quiz mostra um depoimento sorteado no resultado. Adicione quantos
+            quiser.
+          </p>
+          <div className="space-y-3">
+            {testimonials.map((t, i) => (
+              <div
+                key={i}
+                className="rounded-lg border border-slate-200 bg-slate-50 p-3"
+              >
+                <div className="flex items-start gap-2">
+                  <span className="mt-2 text-xs font-semibold text-slate-400">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1 space-y-2">
+                    <textarea
+                      value={t.text}
+                      onChange={(e) => updateTestimonial(i, { text: e.target.value })}
+                      className={textareaCls + ' bg-white'}
+                      placeholder="Frase do depoimento."
+                    />
+                    <input
+                      value={t.author}
+                      onChange={(e) => updateTestimonial(i, { author: e.target.value })}
+                      className={inputCls + ' bg-white'}
+                      placeholder="Nome, profissão"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeTestimonial(i)}
+                    className="mt-1 text-slate-400 hover:text-red-500"
+                    aria-label="Remover depoimento"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={addTestimonial}
+            className="mt-3 text-sm font-medium text-emerald-600 hover:text-emerald-700"
+          >
+            + Adicionar depoimento
+          </button>
+        </div>
       </Section>
 
       <Section title="Captura de lead">
