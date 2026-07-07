@@ -74,6 +74,7 @@ export function QuizzesView() {
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
                 <tr>
+                  <th className="px-4 py-3 font-medium">#</th>
                   <th className="px-4 py-3 font-medium">Nome</th>
                   <th className="px-4 py-3 font-medium">Tipo</th>
                   <th className="px-4 py-3 font-medium">Status</th>
@@ -82,8 +83,11 @@ export function QuizzesView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {quizzes.map((q) => (
+                {quizzes.map((q, i) => (
                   <tr key={q.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-3 text-sm font-medium text-slate-400">
+                      {i + 1}
+                    </td>
                     <td className="px-4 py-3">
                       <Link
                         href={`/quizzes/${q.id}`}
@@ -101,7 +105,15 @@ export function QuizzesView() {
                       <StatusBadge status={q.status} />
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-xs text-slate-500">/q/{q.slug}</span>
+                      <a
+                        href={`/q/${q.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+                        title="Abrir o quiz em nova aba"
+                      >
+                        /q/{q.slug} ↗
+                      </a>
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button

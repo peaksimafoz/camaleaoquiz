@@ -5,6 +5,8 @@ import { toast } from 'sonner'
 import type { Quiz, Result, ScoreCondition } from '@/types'
 import { createResult, updateResult, deleteResult } from '@/lib/quizzes'
 import { errMsg } from '@/lib/err'
+import { useAutosave } from '@/lib/useAutosave'
+import { SaveBadge } from '@/components/ui/SaveBadge'
 import { inputCls, textareaCls, selectCls, Field } from '@/components/ui/form'
 
 export function ResultsTab({
@@ -99,8 +101,23 @@ function ResultCard({
   onSaved: (r: Result) => void
 }) {
   const [draft, setDraft] = useState<Result>(result)
-  const [saving, setSaving] = useState(false)
   const condType = condTypeOf(draft.score_condition)
+
+  const saveState = useAutosave(draft, async (d) => {
+    try {
+      await updateResult(d.id, {
+        name: d.name,
+        text: d.text,
+        cta_label: d.cta_label || null,
+        cta_url: d.cta_url || null,
+        score_condition: d.score_condition,
+      })
+      onSaved(d)
+    } catch (e: unknown) {
+      toast.error('Erro ao salvar: ' + errMsg(e))
+      throw e
+    }
+  })
 
   function setCond(c: ScoreCondition) {
     setDraft({ ...draft, score_condition: c })
@@ -111,25 +128,6 @@ function ResultCard({
     else if (t === 'winning')
       setCond({ winning_category: categories[0] ?? '' })
     else setCond({ category: categories[0] ?? '', min: 0 })
-  }
-
-  async function save() {
-    setSaving(true)
-    try {
-      await updateResult(draft.id, {
-        name: draft.name,
-        text: draft.text,
-        cta_label: draft.cta_label || null,
-        cta_url: draft.cta_url || null,
-        score_condition: draft.score_condition,
-      })
-      onSaved(draft)
-      toast.success('Resultado salvo.')
-    } catch (e: unknown) {
-      toast.error('Erro ao salvar: ' + errMsg(e))
-    } finally {
-      setSaving(false)
-    }
   }
 
   const cond = draft.score_condition
@@ -236,19 +234,13 @@ function ResultCard({
         </div>
       )}
 
-      <div className="flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+      <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-3">
+        <SaveBadge state={saveState} />
         <button
           onClick={() => onRemove(result)}
           className="text-xs text-slate-400 hover:text-red-500"
         >
           Excluir
-        </button>
-        <button
-          onClick={save}
-          disabled={saving}
-          className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
-        >
-          {saving ? 'Salvando…' : 'Salvar'}
         </button>
       </div>
     </div>

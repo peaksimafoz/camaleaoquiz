@@ -6,6 +6,8 @@ import type { Quiz, QuizSettings, LeadCapturePosition } from '@/types'
 import { updateQuiz } from '@/lib/quizzes'
 import { slugify } from '@/lib/utils'
 import { errMsg } from '@/lib/err'
+import { useAutosave } from '@/lib/useAutosave'
+import { SaveBadge } from '@/components/ui/SaveBadge'
 import { Field, inputCls, textareaCls, selectCls } from '@/components/ui/form'
 
 export function SettingsTab({
@@ -16,8 +18,31 @@ export function SettingsTab({
   onChange: (q: Quiz) => void
 }) {
   const [draft, setDraft] = useState<Quiz>(quiz)
-  const [saving, setSaving] = useState(false)
   const [newCat, setNewCat] = useState('')
+
+  // Salvamento automático (debounce). Só salva se nome e slug estiverem preenchidos.
+  const saveState = useAutosave(draft, async (d) => {
+    if (!d.name.trim() || !d.slug.trim()) return
+    try {
+      await updateQuiz(d.id, {
+        name: d.name.trim(),
+        slug: d.slug.trim(),
+        type: d.type,
+        webhook_url: d.webhook_url || null,
+        lead_capture_position: d.lead_capture_position,
+        settings: d.settings,
+      })
+      onChange(d)
+    } catch (e: unknown) {
+      const m = errMsg(e)
+      toast.error(
+        m.includes('duplicate') || m.includes('unique')
+          ? 'Já existe um quiz com esse slug.'
+          : 'Erro ao salvar: ' + m
+      )
+      throw e
+    }
+  })
 
   const s: QuizSettings = draft.settings ?? {}
 
@@ -40,35 +65,6 @@ export function SettingsTab({
 
   function removeCategory(c: string) {
     setSettings({ categories: categories.filter((x) => x !== c) })
-  }
-
-  async function save() {
-    if (!draft.name.trim() || !draft.slug.trim()) {
-      toast.error('Nome e slug são obrigatórios.')
-      return
-    }
-    setSaving(true)
-    try {
-      await updateQuiz(draft.id, {
-        name: draft.name.trim(),
-        slug: draft.slug.trim(),
-        type: draft.type,
-        webhook_url: draft.webhook_url || null,
-        lead_capture_position: draft.lead_capture_position,
-        settings: draft.settings,
-      })
-      onChange(draft)
-      toast.success('Configurações salvas.')
-    } catch (e: unknown) {
-      const m = errMsg(e)
-      toast.error(
-        m.includes('duplicate') || m.includes('unique')
-          ? 'Já existe um quiz com esse slug.'
-          : 'Erro ao salvar: ' + m
-      )
-    } finally {
-      setSaving(false)
-    }
   }
 
   return (
@@ -257,14 +253,9 @@ export function SettingsTab({
         </Field>
       </Section>
 
-      <div className="sticky bottom-0 flex justify-end border-t border-slate-200 bg-slate-50 py-4">
-        <button
-          onClick={save}
-          disabled={saving}
-          className="rounded-lg bg-emerald-500 px-5 py-2 text-sm font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
-        >
-          {saving ? 'Salvando…' : 'Salvar configurações'}
-        </button>
+      <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t border-slate-200 bg-slate-50 py-4 text-sm text-slate-400">
+        <span>As alterações são salvas automaticamente.</span>
+        <SaveBadge state={saveState} />
       </div>
     </div>
   )

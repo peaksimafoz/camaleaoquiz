@@ -17,6 +17,8 @@ import {
   deleteQuestion,
 } from '@/lib/quizzes'
 import { errMsg } from '@/lib/err'
+import { useAutosave } from '@/lib/useAutosave'
+import { SaveBadge } from '@/components/ui/SaveBadge'
 import { inputCls, textareaCls, selectCls } from '@/components/ui/form'
 
 export function QuestionsTab({
@@ -141,7 +143,20 @@ function QuestionCard({
   onSaved: (q: Question) => void
 }) {
   const [draft, setDraft] = useState<Question>(question)
-  const [saving, setSaving] = useState(false)
+
+  const saveState = useAutosave(draft, async (d) => {
+    try {
+      await updateQuestion(d.id, {
+        text: d.text,
+        type: d.type,
+        options: d.options,
+      })
+      onSaved(d)
+    } catch (e: unknown) {
+      toast.error('Erro ao salvar: ' + errMsg(e))
+      throw e
+    }
+  })
 
   function changeType(type: QuestionType) {
     let options: Question['options']
@@ -150,23 +165,6 @@ function QuestionCard({
       options = { min: 1, max: 5, min_label: '', max_label: '' } as ScaleConfig
     else options = { placeholder: '' } as TextConfig
     setDraft({ ...draft, type, options })
-  }
-
-  async function save() {
-    setSaving(true)
-    try {
-      await updateQuestion(draft.id, {
-        text: draft.text,
-        type: draft.type,
-        options: draft.options,
-      })
-      onSaved(draft)
-      toast.success('Pergunta salva.')
-    } catch (e: unknown) {
-      toast.error('Erro ao salvar: ' + errMsg(e))
-    } finally {
-      setSaving(false)
-    }
   }
 
   return (
@@ -237,19 +235,13 @@ function QuestionCard({
             ↓
           </IconBtn>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
+          <SaveBadge state={saveState} />
           <button
             onClick={() => onRemove(question)}
             className="text-xs text-slate-400 hover:text-red-500"
           >
             Excluir
-          </button>
-          <button
-            onClick={save}
-            disabled={saving}
-            className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
-          >
-            {saving ? 'Salvando…' : 'Salvar'}
           </button>
         </div>
       </div>
