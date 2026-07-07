@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { Quiz } from '@/types'
 import { listQuizzes } from '@/lib/quizzes'
-import { listLeads, type LeadRow } from '@/lib/leads'
+import { listLeads, deleteLeads, type LeadRow } from '@/lib/leads'
 import { errMsg } from '@/lib/err'
 import { selectCls } from '@/components/ui/form'
 
@@ -13,6 +13,7 @@ export function LeadsView() {
   const [leads, setLeads] = useState<LeadRow[]>([])
   const [quizId, setQuizId] = useState<string>('')
   const [loading, setLoading] = useState(true)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     listQuizzes()
@@ -22,22 +23,45 @@ export function LeadsView() {
 
   useEffect(() => {
     setLoading(true)
+    setSelected(new Set())
     listLeads(quizId || undefined)
       .then(setLeads)
       .catch((e) => toast.error('Erro ao carregar leads: ' + errMsg(e)))
       .finally(() => setLoading(false))
   }, [quizId])
 
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const allSelected = leads.length > 0 && selected.size === leads.length
+  function toggleAll() {
+    setSelected(allSelected ? new Set() : new Set(leads.map((l) => l.id)))
+  }
+
+  async function removeLeads(ids: string[], label: string) {
+    if (ids.length === 0) return
+    if (!confirm(`Excluir ${label}? Esta ação é irreversível.`)) return
+    try {
+      await deleteLeads(ids)
+      const idSet = new Set(ids)
+      setLeads((prev) => prev.filter((l) => !idSet.has(l.id)))
+      setSelected(new Set())
+      toast.success(
+        ids.length === 1 ? 'Lead excluído.' : `${ids.length} leads excluídos.`
+      )
+    } catch (e: unknown) {
+      toast.error('Erro ao excluir: ' + errMsg(e))
+    }
+  }
+
   function exportCsv() {
-    const headers = [
-      'Data',
-      'Nome',
-      'E-mail',
-      'WhatsApp',
-      'Instagram',
-      'Quiz',
-      'Resultado',
-    ]
+    const headers = ['Data', 'Nome', 'E-mail', 'WhatsApp', 'Instagram', 'Quiz', 'Resultado']
     const rows = leads.map((l) => [
       new Date(l.created_at).toLocaleString('pt-BR'),
       l.name ?? '',
@@ -47,10 +71,7 @@ export function LeadsView() {
       l.quizzes?.name ?? '',
       l.results?.name ?? '',
     ])
-    const csv = [headers, ...rows]
-      .map((r) => r.map(csvCell).join(','))
-      .join('\r\n')
-    // BOM para o Excel abrir acentos corretamente
+    const csv = [headers, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n')
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -69,13 +90,28 @@ export function LeadsView() {
             Pessoas que preencheram seus quizzes.
           </p>
         </div>
-        <button
-          onClick={exportCsv}
-          disabled={leads.length === 0}
-          className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-50"
-        >
-          ↓ Exportar CSV
-        </button>
+        <div className="flex items-center gap-2">
+          {selected.size > 0 && (
+            <button
+              onClick={() =>
+                removeLeads(
+                  Array.from(selected),
+                  `${selected.size} lead(s) selecionado(s)`
+                )
+              }
+              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
+            >
+              Excluir selecionados ({selected.size})
+            </button>
+          )}
+          <button
+            onClick={exportCsv}
+            disabled={leads.length === 0}
+            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-50"
+          >
+            ↓ Exportar CSV
+          </button>
+        </div>
       </div>
 
       <div className="mt-6 flex items-center gap-3">
@@ -109,6 +145,15 @@ export function LeadsView() {
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
                 <tr>
+                  <th className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleAll}
+                      className="h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500"
+                      aria-label="Selecionar todos"
+                    />
+                  </th>
                   <th className="whitespace-nowrap px-4 py-3 font-medium">Data</th>
                   <th className="px-4 py-3 font-medium">Nome</th>
                   <th className="px-4 py-3 font-medium">E-mail</th>
@@ -116,27 +161,32 @@ export function LeadsView() {
                   <th className="px-4 py-3 font-medium">Instagram</th>
                   <th className="px-4 py-3 font-medium">Quiz</th>
                   <th className="px-4 py-3 font-medium">Resultado</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {leads.map((l) => (
-                  <tr key={l.id} className="hover:bg-slate-50">
+                  <tr
+                    key={l.id}
+                    className={selected.has(l.id) ? 'bg-emerald-50/50' : 'hover:bg-slate-50'}
+                  >
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selected.has(l.id)}
+                        onChange={() => toggleOne(l.id)}
+                        className="h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500"
+                        aria-label="Selecionar lead"
+                      />
+                    </td>
                     <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500">
                       {new Date(l.created_at).toLocaleString('pt-BR')}
                     </td>
                     <td className="px-4 py-3 text-slate-900">{l.name || '—'}</td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {l.email || '—'}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {l.whatsapp || '—'}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {l.instagram || '—'}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {l.quizzes?.name || '—'}
-                    </td>
+                    <td className="px-4 py-3 text-slate-600">{l.email || '—'}</td>
+                    <td className="px-4 py-3 text-slate-600">{l.whatsapp || '—'}</td>
+                    <td className="px-4 py-3 text-slate-600">{l.instagram || '—'}</td>
+                    <td className="px-4 py-3 text-slate-600">{l.quizzes?.name || '—'}</td>
                     <td className="px-4 py-3">
                       {l.results?.name ? (
                         <span className="rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">
@@ -145,6 +195,16 @@ export function LeadsView() {
                       ) : (
                         '—'
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => removeLeads([l.id], 'este lead')}
+                        className="text-slate-400 transition hover:text-red-500"
+                        aria-label="Excluir lead"
+                        title="Excluir"
+                      >
+                        🗑️
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -157,7 +217,6 @@ export function LeadsView() {
   )
 }
 
-// Escapa um valor para CSV (aspas + separadores + quebras de linha).
 function csvCell(v: string): string {
   if (/[",\r\n]/.test(v)) return `"${v.replace(/"/g, '""')}"`
   return v

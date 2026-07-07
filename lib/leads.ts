@@ -28,3 +28,9 @@ export async function listLeads(quizId?: string): Promise<LeadRow[]> {
   if (error) throw error
   return (data ?? []) as unknown as LeadRow[]
 }
+
+export async function deleteLeads(ids: string[]): Promise<void> {
+  if (ids.length === 0) return
+  const { error } = await createClient().from('leads').delete().in('id', ids)
+  if (error) throw error
+}
