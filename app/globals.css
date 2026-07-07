@@ -14,3 +14,18 @@ body {
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
 }
+
+/* Transição suave entre telas/perguntas do quiz público */
+@keyframes qfade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.q-anim {
+  animation: qfade 0.28s ease;
+}

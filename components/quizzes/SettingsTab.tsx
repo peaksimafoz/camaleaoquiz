@@ -147,6 +147,65 @@ export function SettingsTab({
         </div>
       </Section>
 
+      <Section title="Marca e persuasão">
+        <Field
+          label="Logo (URL da imagem)"
+          hint="Aparece no topo da página do quiz. Deixe em branco para não mostrar."
+        >
+          <input
+            value={s.logo_url ?? ''}
+            onChange={(e) => setSettings({ logo_url: e.target.value })}
+            className={inputCls}
+            placeholder="https://.../logo.png"
+          />
+        </Field>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Prova social" hint="Ex.: +1.000 pessoas atendidas">
+            <input
+              value={s.intro_social_proof ?? ''}
+              onChange={(e) => setSettings({ intro_social_proof: e.target.value })}
+              className={inputCls}
+              placeholder="+1.000 pessoas atendidas"
+            />
+          </Field>
+          <Field label="Tempo estimado" hint="Ex.: 1 minuto">
+            <input
+              value={s.intro_time ?? ''}
+              onChange={(e) => setSettings({ intro_time: e.target.value })}
+              className={inputCls}
+              placeholder="1 minuto"
+            />
+          </Field>
+        </div>
+        <Field
+          label="Selo de garantia (no resultado)"
+          hint="Ex.: Garantia de 7 dias. Deixe em branco para não mostrar."
+        >
+          <input
+            value={s.result_guarantee ?? ''}
+            onChange={(e) => setSettings({ result_guarantee: e.target.value })}
+            className={inputCls}
+            placeholder="Garantia de 7 dias"
+          />
+        </Field>
+        <Field label="Depoimento (no resultado)">
+          <textarea
+            value={s.testimonial_text ?? ''}
+            onChange={(e) => setSettings({ testimonial_text: e.target.value })}
+            className={textareaCls}
+            placeholder="Frase do depoimento de um aluno."
+          />
+        </Field>
+        <Field label="Autor do depoimento">
+          <input
+            value={s.testimonial_author ?? ''}
+            onChange={(e) => setSettings({ testimonial_author: e.target.value })}
+            className={inputCls}
+            placeholder="João, empresário"
+          />
+        </Field>
+      </Section>
+
       <Section title="Captura de lead">
         <Field
           label="Quando pedir os dados de contato"

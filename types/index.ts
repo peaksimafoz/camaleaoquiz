@@ -17,6 +17,12 @@ export interface QuizSettings {
   intro_cta?: string
   primary_color?: string
   logo_url?: string
+  // Elementos de persuasão (aparecem na página do quiz quando preenchidos)
+  intro_social_proof?: string
+  intro_time?: string
+  result_guarantee?: string
+  testimonial_text?: string
+  testimonial_author?: string
   // Categorias de pontuação do quiz (ex.: 'comunicacao', 'lideranca'). As opções
   // das perguntas somam pesos nessas categorias; os resultados usam-nas para
   // decidir qual mostrar (categoria vencedora / faixa de pontos).
