@@ -244,6 +244,46 @@ export function SettingsTab({
         </div>
       </Section>
 
+      <Section title="E-mail automático (com e-book)">
+        <Check
+          label="Enviar o resultado por e-mail quando a pessoa finalizar"
+          checked={s.email_enabled ?? false}
+          onChange={(v) => setSettings({ email_enabled: v })}
+        />
+        {s.email_enabled && (
+          <>
+            <Field
+              label="Assunto do e-mail (opcional)"
+              hint="Se vazio, usamos: 'Seu resultado: [nome do resultado]'."
+            >
+              <input
+                value={s.email_subject ?? ''}
+                onChange={(e) => setSettings({ email_subject: e.target.value })}
+                className={inputCls}
+                placeholder="Seu diagnóstico + presente 🎁"
+              />
+            </Field>
+            <Field
+              label="Link do e-book / anexo (opcional)"
+              hint="Precisa ser um link DIRETO para o arquivo PDF (não a página de compartilhamento). Deixe em branco para enviar só o resultado, sem anexo."
+            >
+              <input
+                value={s.ebook_url ?? ''}
+                onChange={(e) => setSettings({ ebook_url: e.target.value })}
+                className={inputCls}
+                placeholder="https://.../meu-ebook.pdf"
+              />
+            </Field>
+            <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
+              O e-mail exige a conta de envio configurada no servidor
+              (variáveis <code>GMAIL_USER</code> e{' '}
+              <code>GMAIL_APP_PASSWORD</code>). Coleta de e-mail precisa estar
+              ativada acima.
+            </p>
+          </>
+        )}
+      </Section>
+
       <Section title="Integração (webhook)">
         <Field
           label="URL do webhook"

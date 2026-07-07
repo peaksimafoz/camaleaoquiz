@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { adminClient } from '@/lib/supabase/admin'
 import { getPublicQuiz } from '@/lib/public'
 import { computeScores, resolveResult, type Answers } from '@/lib/scoring'
+import { emailConfigured, sendResultEmail } from '@/lib/email'
 
 // POST /api/public/submit → finaliza o quiz: calcula pontuação/resultado,
 // grava o lead e o evento 'completed'. Retorna o resultado escolhido.
@@ -102,6 +103,26 @@ export async function POST(req: Request) {
           : null,
         completed_at: new Date().toISOString(),
       })
+    }
+
+    // E-mail automático com o resultado + e-book (best-effort, não bloqueia).
+    if (quiz.settings?.email_enabled && contact?.email && emailConfigured()) {
+      try {
+        await sendResultEmail({
+          to: contact.email,
+          name: contact.name,
+          quizName: quiz.name,
+          resultName: result?.name,
+          resultText: result?.text,
+          ctaLabel: result?.cta_label,
+          ctaUrl: result?.cta_url,
+          subject: quiz.settings.email_subject,
+          ebookUrl: quiz.settings.ebook_url,
+          primaryColor: quiz.settings.primary_color,
+        })
+      } catch (e) {
+        console.error('email error', e)
+      }
     }
 
     return NextResponse.json({ result, lead_id: lead.id, scores })

@@ -26,6 +26,10 @@ export interface QuizSettings {
   collect_email?: boolean
   collect_whatsapp?: boolean
   collect_instagram?: boolean
+  // E-mail automático (envia o resultado + e-book quando a pessoa finaliza)
+  email_enabled?: boolean
+  email_subject?: string
+  ebook_url?: string
 }
 
 export interface Quiz {
