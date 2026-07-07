@@ -75,7 +75,8 @@ function renderHtml(o: ResultEmail, color: string): string {
 
   const courseInvite =
     o.ctaUrl && o.ctaLabel
-      ? `<p style="font-size:14px;line-height:1.6;color:#64748b;margin:24px 0 0;">Quer se aprofundar nesse ponto? Dei um jeito prático nisso no curso <strong>Camaleão da Comunicação</strong>. <a href="${esc(o.ctaUrl)}" style="color:${color};text-decoration:underline;">${esc(o.ctaLabel)}</a></p>`
+      ? `<p style="font-size:14px;line-height:1.6;color:#64748b;margin:28px 0 12px;">Quer se aprofundar nesse ponto? Dei um jeito prático nisso no curso <strong>Camaleão da Comunicação</strong>.</p>
+         <a href="${esc(o.ctaUrl)}" style="display:inline-block;background:${color};color:#fff;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:600;font-size:15px;">${esc(o.ctaLabel)}</a>`
       : ''
 
   return `<!doctype html>
