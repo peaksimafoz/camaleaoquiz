@@ -44,8 +44,10 @@ export default async function Image({
   const s = quiz?.settings ?? {}
   const title = s.intro_title || quiz?.name || 'Descubra seu resultado'
   const subtitle = s.intro_subtitle || ''
-  const logo = s.logo_url
   const primary = s.primary_color || '#10b981'
+  // Só o ícone da marca (o balão), sem o texto "Felipe Felipetti".
+  const icon =
+    'https://inatzqvwxlsbmhxwycvq.supabase.co/storage/v1/object/public/assets/felipe-icon.png'
 
   return new ImageResponse(
     (
@@ -61,10 +63,8 @@ export default async function Image({
           padding: '72px 80px',
         }}
       >
-        {logo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt="" height={150} style={{ marginBottom: 44 }} />
-        ) : null}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={icon} alt="" height={180} style={{ marginBottom: 44 }} />
         <div
           style={{
             display: 'flex',
