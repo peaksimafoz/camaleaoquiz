@@ -1,8 +1,30 @@
+import type { Metadata } from 'next'
 import { getPublicQuiz } from '@/lib/public'
 import { QuizRunner } from '@/components/public/QuizRunner'
 
 // Sempre renderiza fresco (as configurações do quiz mudam no banco a qualquer hora).
 export const dynamic = 'force-dynamic'
+
+// Preview de link (WhatsApp/redes): título e descrição do próprio quiz.
+// A imagem vem do arquivo opengraph-image.tsx (convention do Next).
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string }
+}): Promise<Metadata> {
+  const data = await getPublicQuiz(params.slug)
+  if (!data) return { title: 'Quiz' }
+  const s = data.quiz.settings ?? {}
+  const title = s.intro_title || data.quiz.name
+  const description =
+    s.intro_subtitle || 'Responda o quiz e descubra seu resultado.'
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: 'website' },
+    twitter: { card: 'summary_large_image', title, description },
+  }
+}
 
 export default async function PublicQuizPage({
   params,
