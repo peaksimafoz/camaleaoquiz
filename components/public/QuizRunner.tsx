@@ -185,12 +185,12 @@ export function QuizRunner({ data }: { data: PublicQuiz }) {
     >
       <div className="w-full max-w-md">
         {settings.logo_url && (
-          <div className="mb-5 flex justify-center">
+          <div className="mb-6 mt-3 flex justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={settings.logo_url}
               alt={quiz.name}
-              className="h-14 w-auto object-contain"
+              className="h-[72px] w-auto object-contain"
             />
           </div>
         )}
@@ -233,15 +233,7 @@ export function QuizRunner({ data }: { data: PublicQuiz }) {
             </div>
           )}
 
-          {phase === 'submitting' && (
-            <div className="py-12 text-center">
-              <div
-                className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-slate-200"
-                style={{ borderTopColor: primary }}
-              />
-              <p className="mt-4 text-sm text-slate-500">Calculando seu resultado…</p>
-            </div>
-          )}
+          {phase === 'submitting' && <CalculatingScreen primary={primary} />}
 
           {phase === 'result' && (
             <div className="q-anim">
@@ -267,6 +259,30 @@ function ProgressBar({ percent, primary }: { percent: number; primary: string })
         className="h-full rounded-full transition-all duration-500"
         style={{ width: `${Math.max(4, percent)}%`, backgroundColor: primary }}
       />
+    </div>
+  )
+}
+
+function CalculatingScreen({ primary }: { primary: string }) {
+  const [pct, setPct] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => {
+      setPct((p) => (p >= 100 ? 100 : p + 2))
+    }, 30)
+    return () => clearInterval(id)
+  }, [])
+  return (
+    <div className="py-10 text-center">
+      <div className="text-5xl font-bold tabular-nums" style={{ color: primary }}>
+        {pct}%
+      </div>
+      <div className="mx-auto mt-5 h-2 w-48 overflow-hidden rounded-full bg-slate-100">
+        <div
+          className="h-full rounded-full transition-all duration-100"
+          style={{ width: `${pct}%`, backgroundColor: primary }}
+        />
+      </div>
+      <p className="mt-4 text-sm text-slate-500">Analisando suas respostas…</p>
     </div>
   )
 }
@@ -561,13 +577,6 @@ function ResultScreen({
         </p>
       )}
 
-      {settings.result_guarantee && (
-        <div className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3.5 py-1.5 text-xs font-medium text-emerald-700">
-          <span aria-hidden>🛡️</span>
-          {settings.result_guarantee}
-        </div>
-      )}
-
       {testimonial && testimonial.text && (
         <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left">
           <p className="text-sm italic leading-relaxed text-slate-600">
@@ -578,6 +587,13 @@ function ResultScreen({
               — {testimonial.author}
             </p>
           )}
+        </div>
+      )}
+
+      {settings.result_guarantee && (
+        <div className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3.5 py-1.5 text-xs font-medium text-emerald-700">
+          <span aria-hidden>🛡️</span>
+          {settings.result_guarantee}
         </div>
       )}
 
