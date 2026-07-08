@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import type {
   PublicQuiz,
   QuizSettings,
@@ -24,6 +24,19 @@ type Collect = {
   email: boolean
   whatsapp: boolean
   instagram: boolean
+}
+
+// Renderiza texto com suporte a **negrito** (asteriscos duplos → <strong>).
+// Mantém quebras de linha (o container usa whitespace-pre-line).
+function renderRich(text?: string | null): React.ReactNode {
+  if (!text) return null
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') ? (
+      <strong key={i}>{part.slice(2, -2)}</strong>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    )
+  )
 }
 
 function fireEvent(quizId: string, eventType: string, questionId?: string) {
@@ -310,11 +323,11 @@ function IntroScreen({
   return (
     <div className="py-2 text-center">
       <h1 className="text-2xl font-bold leading-tight text-slate-900">
-        {settings.intro_title || quizName}
+        {renderRich(settings.intro_title || quizName)}
       </h1>
       {settings.intro_subtitle && (
         <p className="mx-auto mt-3 max-w-sm whitespace-pre-line text-[15px] leading-relaxed text-slate-600">
-          {settings.intro_subtitle}
+          {renderRich(settings.intro_subtitle)}
         </p>
       )}
       {(settings.intro_social_proof || settings.intro_time) && (
@@ -348,7 +361,7 @@ function QuestionScreen({
   return (
     <div>
       <h2 className="text-lg font-semibold leading-snug text-slate-900">
-        {question.text}
+        {renderRich(question.text)}
       </h2>
       <div className="mt-5">
         {question.type === 'multiple_choice' && (
@@ -368,7 +381,7 @@ function QuestionScreen({
                 >
                   {String.fromCharCode(65 + i)}
                 </span>
-                <span>{o.label || '—'}</span>
+                <span>{o.label ? renderRich(o.label) : '—'}</span>
               </button>
             ))}
           </div>
@@ -570,17 +583,19 @@ function ResultScreen({
       >
         ✓
       </div>
-      <h2 className="text-xl font-bold text-slate-900">{result.name}</h2>
+      <h2 className="text-xl font-bold text-slate-900">
+        {renderRich(result.name)}
+      </h2>
       {result.text && (
         <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-slate-600">
-          {result.text}
+          {renderRich(result.text)}
         </p>
       )}
 
       {testimonial && testimonial.text && (
         <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left">
           <p className="text-sm italic leading-relaxed text-slate-600">
-            “{testimonial.text}”
+            “{renderRich(testimonial.text)}”
           </p>
           {testimonial.author && (
             <p className="mt-2 text-xs font-semibold text-slate-700">
