@@ -512,16 +512,52 @@ function LeadScreen({
       )}
       <div className="mt-5 space-y-3">
         {collect.name && (
-          <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome" className={field} />
+          <input
+            required
+            name="name"
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Seu nome"
+            className={field}
+          />
         )}
         {collect.email && (
-          <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Seu melhor e-mail" className={field} />
+          <input
+            required
+            type="email"
+            name="email"
+            autoComplete="email"
+            inputMode="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Seu melhor e-mail"
+            className={field}
+          />
         )}
         {collect.whatsapp && (
-          <input required value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="Seu WhatsApp" className={field} />
+          <input
+            required
+            type="tel"
+            name="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            value={whatsapp}
+            onChange={(e) => setWhatsapp(e.target.value)}
+            placeholder="Seu WhatsApp"
+            className={field}
+          />
         )}
         {collect.instagram && (
-          <input required value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="Seu @ do Instagram" className={field} />
+          <input
+            required
+            name="instagram"
+            autoComplete="off"
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+            placeholder="Seu @ do Instagram"
+            className={field}
+          />
         )}
       </div>
       <button
