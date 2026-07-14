@@ -16,6 +16,25 @@ export interface Testimonial {
   author: string
 }
 
+// ── Eneagrama (quiz composto: perfil + radar emocional) ──────────────────────
+export interface EnneagramType {
+  name: string // "Eneatipo 3 — O Realizador"
+  full: string // texto completo (quando cravado / tipo único)
+  short: string // resumo curto (quando em combinação)
+  comm?: string // "Na comunicação:" (mostrado só no tipo único)
+}
+export interface EnneagramVice {
+  name: string // "Vaidade (busca por sucesso e reconhecimento)"
+  text: string // texto do radar
+}
+export interface EnneagramConfig {
+  types: Record<string, EnneagramType> // chaves tipo1..tipo9
+  vices: Record<string, EnneagramVice> // chaves vicio1..vicio9
+  closing?: string
+  cta_label?: string
+  cta_url?: string
+}
+
 export interface QuizSettings {
   intro_title?: string
   intro_subtitle?: string
@@ -31,6 +50,9 @@ export interface QuizSettings {
   // Legado (fallback quando `testimonials` está vazio)
   testimonial_text?: string
   testimonial_author?: string
+  // Modo de resultado: 'standard' (padrão) ou 'enneagram' (perfil + radar)
+  result_mode?: 'standard' | 'enneagram'
+  enneagram?: EnneagramConfig
   // Categorias de pontuação do quiz (ex.: 'comunicacao', 'lideranca'). As opções
   // das perguntas somam pesos nessas categorias; os resultados usam-nas para
   // decidir qual mostrar (categoria vencedora / faixa de pontos).
