@@ -203,6 +203,11 @@ export function SettingsTab({
             placeholder="Garantia de 7 dias"
           />
         </Field>
+        <Check
+          label="Layout compacto no resultado (menos espaço entre os blocos, botão mais visível no celular)"
+          checked={s.compact_result_layout ?? false}
+          onChange={(v) => setSettings({ compact_result_layout: v })}
+        />
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700">
             Depoimentos

@@ -45,6 +45,9 @@ export interface QuizSettings {
   intro_social_proof?: string
   intro_time?: string
   result_guarantee?: string
+  // Layout compacto na tela de resultado (menos espaço entre os blocos, botão
+  // mais próximo do topo). Opt-in por quiz — não muda o padrão dos demais.
+  compact_result_layout?: boolean
   // Depoimentos: o quiz sorteia um para exibir no resultado a cada visita.
   testimonials?: Testimonial[]
   // Legado (fallback quando `testimonials` está vazio)

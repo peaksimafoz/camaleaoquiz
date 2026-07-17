@@ -623,6 +623,7 @@ function ResultScreen({
     pool.length > 0 ? Math.floor(Math.random() * pool.length) : 0
   )
   const testimonial = pool[tIdx]
+  const compact = settings.compact_result_layout
 
   if (!result) {
     return (
@@ -637,7 +638,7 @@ function ResultScreen({
   return (
     <div className="text-center">
       <div
-        className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full text-2xl text-white"
+        className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full text-2xl text-white ${compact ? 'mb-3' : 'mb-4'}`}
         style={{ backgroundColor: primary }}
       >
         ✓
@@ -646,18 +647,18 @@ function ResultScreen({
         {renderRich(result.name)}
       </h2>
       {result.text && (
-        <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-slate-600">
+        <p className={`whitespace-pre-line text-[15px] leading-relaxed text-slate-600 ${compact ? 'mt-2' : 'mt-3'}`}>
           {renderRich(result.text)}
         </p>
       )}
 
       {testimonial && testimonial.text && (
-        <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left">
+        <div className={`rounded-xl border border-slate-200 bg-slate-50 text-left ${compact ? 'mt-4 p-3' : 'mt-5 p-4'}`}>
           <p className="text-sm italic leading-relaxed text-slate-600">
             “{renderRich(testimonial.text)}”
           </p>
           {testimonial.author && (
-            <p className="mt-2 text-xs font-semibold text-slate-700">
+            <p className={`text-xs font-semibold text-slate-700 ${compact ? 'mt-1.5' : 'mt-2'}`}>
               — {testimonial.author}
             </p>
           )}
@@ -665,7 +666,7 @@ function ResultScreen({
       )}
 
       {settings.result_guarantee && (
-        <div className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3.5 py-1.5 text-xs font-medium text-emerald-700">
+        <div className={`inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3.5 py-1.5 text-xs font-medium text-emerald-700 ${compact ? 'mt-4' : 'mt-5'}`}>
           <span aria-hidden>🛡️</span>
           {settings.result_guarantee}
         </div>
@@ -676,7 +677,7 @@ function ResultScreen({
           href={result.cta_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 inline-block w-full rounded-xl py-4 text-[15px] font-semibold text-white shadow-sm transition hover:brightness-105 active:scale-[0.98]"
+          className={`inline-block w-full rounded-xl text-[15px] font-semibold text-white shadow-sm transition hover:brightness-105 active:scale-[0.98] ${compact ? 'mt-4 py-3.5' : 'mt-6 py-4'}`}
           style={{ backgroundColor: primary }}
         >
           {result.cta_label || 'Continuar'}
